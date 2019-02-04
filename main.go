@@ -118,7 +118,7 @@ func startCLI(args []string) (msg string, display bool, err error) {
 		},
 		cli.StringFlag{
 			Name:  "separator",
-			Value: ",",
+			Value: " | ",
 			Usage: "field separator for text encoding",
 		},
 		cli.StringFlag{
