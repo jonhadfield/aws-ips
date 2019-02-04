@@ -2,13 +2,12 @@ package main
 
 import (
 	"fmt"
+	"gopkg.in/urfave/cli.v1"
 	"net"
 	"os"
 	"sort"
 	"strings"
 	"time"
-
-	"github.com/urfave/cli"
 )
 
 const (
