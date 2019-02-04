@@ -8,14 +8,10 @@ import (
 func lookupPrefix(input lookupPrefixInput) (output lookupPrefixOutput, err error) {
 	output.doc.CreateDate = input.doc.CreateDate
 	output.doc.SyncToken = input.doc.SyncToken
-	// convert ip string to netIP
 	netIP := net.ParseIP(input.ip)
 	if netIP != nil {
 		if strings.Contains(netIP.String(), ":") {
 			for _, r := range input.doc.IPv6Prefixes {
-				//if r.Service == "AMAZON" {
-				//	continue
-				//}
 				var netPrefix *net.IPNet
 				_, netPrefix, err = net.ParseCIDR(r.IPv6Prefix)
 				if netPrefix.Contains(netIP) {
@@ -24,9 +20,6 @@ func lookupPrefix(input lookupPrefixInput) (output lookupPrefixOutput, err error
 			}
 		} else {
 			for _, r := range input.doc.Prefixes {
-				//if r.Service == "AMAZON" {
-				//	continue
-				//}
 				var netPrefix *net.IPNet
 				_, netPrefix, err = net.ParseCIDR(r.IPPrefix)
 				if netPrefix.Contains(netIP) {

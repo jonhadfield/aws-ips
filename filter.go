@@ -8,7 +8,6 @@ func filterRanges(input filterRangesInput) filterRangesOutput {
 	output.Doc.CreateDate = input.Doc.CreateDate
 	for _, r := range input.Doc.Prefixes {
 		var match bool
-		// match region if specified
 		if input.region != "" {
 			if strings.EqualFold(r.Region, input.region) {
 				match = true
@@ -16,7 +15,6 @@ func filterRanges(input filterRangesInput) filterRangesOutput {
 				continue
 			}
 		}
-		// match service if specified
 		if input.service != "" {
 			if strings.EqualFold(r.Service, input.service) {
 				match = true
@@ -30,7 +28,6 @@ func filterRanges(input filterRangesInput) filterRangesOutput {
 	}
 	for _, ip6r := range input.Doc.IPv6Prefixes {
 		var match bool
-		// match region if specified
 		if input.region != "" {
 			if strings.EqualFold(ip6r.Region, input.region) {
 				match = true
@@ -39,7 +36,6 @@ func filterRanges(input filterRangesInput) filterRangesOutput {
 			}
 		}
 
-		// match service if specified
 		if input.service != "" {
 			if strings.EqualFold(ip6r.Service, input.service) {
 				match = true
