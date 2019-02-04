@@ -12,56 +12,57 @@ import (
 	"github.com/matryer/try"
 )
 
+func loadFromFile(filePath string) (ranges IPRangeDoc, err error) {
+	var fileContent []byte
+	fileContent, err = ioutil.ReadFile(filePath)
+	if err != nil {
+		return
+	}
+	err = json.Unmarshal(fileContent, &ranges)
+	return
+}
+
+func loadFromURL() (ranges IPRangeDoc, err error) {
+	var request *http.Request
+	request, err = http.NewRequest(http.MethodGet, ipURL, nil)
+	if err != nil {
+		return
+	}
+
+	client := &http.Client{
+		Transport: &http.Transport{
+			MaxIdleConnsPerHost: 3,
+			DisableKeepAlives:   false,
+		},
+		Timeout: time.Duration(6) * time.Second,
+	}
+	var resp *http.Response
+
+	err = try.Do(func(attempt int) (bool, error) {
+		var rErr error
+		resp, rErr = client.Do(request)
+		return attempt < 3, rErr
+	})
+
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+
+	var syncRespBodyBytes []byte
+	syncRespBodyBytes, err = getResponseBody(resp)
+	if err != nil {
+		return
+	}
+	err = json.Unmarshal(syncRespBodyBytes, &ranges)
+	return
+}
+
 func loadRanges(filePath string) (ranges IPRangeDoc, err error) {
 	if filePath != "" {
-		var fileContent []byte
-		fileContent, err = ioutil.ReadFile(filePath)
-		if err != nil {
-			return
-		}
-		err = json.Unmarshal(fileContent, &ranges)
-		if err != nil {
-			return
-		}
-	} else {
-		var request *http.Request
-		request, err = http.NewRequest(http.MethodGet, ipURL, nil)
-		if err != nil {
-			return
-		}
-
-		client := &http.Client{
-			Transport: &http.Transport{
-				MaxIdleConnsPerHost: 3,
-				DisableKeepAlives:   false,
-			},
-			Timeout: time.Duration(6) * time.Second,
-		}
-		var resp *http.Response
-
-		err = try.Do(func(attempt int) (bool, error) {
-			var rErr error
-			resp, rErr = client.Do(request)
-			return attempt < 3, rErr
-		})
-
-		if err != nil {
-			return
-		}
-		defer resp.Body.Close()
-
-		// process response body
-		var syncRespBodyBytes []byte
-		syncRespBodyBytes, err = getResponseBody(resp)
-		if err != nil {
-			return
-		}
-		err = json.Unmarshal(syncRespBodyBytes, &ranges)
-		if err != nil {
-			return
-		}
+		return loadFromFile(filePath)
 	}
-	return ranges, err
+	return loadFromURL()
 
 }
 
