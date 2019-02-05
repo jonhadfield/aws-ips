@@ -45,7 +45,11 @@ type IPRangeDoc struct {
 }
 
 // overwritten at build time
-var version, versionOutput, tag, sha, buildDate string
+var (
+	version, versionOutput, tag, sha, buildDate string
+	msg                                         string
+	rCode                                       int
+)
 
 func stringInSlice(a string, list []string) bool {
 	for _, b := range list {
@@ -57,7 +61,7 @@ func stringInSlice(a string, list []string) bool {
 }
 
 func main() {
-	msg, display, err := startCLI(os.Args)
+	display, err := startCLI(os.Args)
 	if err != nil {
 		fmt.Printf("error: %+v\n", err)
 		os.Exit(1)
@@ -65,10 +69,10 @@ func main() {
 	if display && msg != "" {
 		fmt.Print(msg)
 	}
-	os.Exit(0)
+	os.Exit(rCode)
 }
 
-func startCLI(args []string) (msg string, display bool, err error) {
+func startCLI(args []string) (display bool, err error) {
 	app := cli.NewApp()
 	app.EnableBashCompletion = true
 
@@ -176,7 +180,6 @@ func startCLI(args []string) (msg string, display bool, err error) {
 				_, _ = fmt.Fprintf(c.App.Writer, "error: name cannot be used with region or service.\n")
 				os.Exit(1)
 			}
-			// TODO: check name is valid (format and lookup)
 		}
 
 		for _, f := range strings.Split(fields, ",") {
@@ -258,6 +261,9 @@ func startCLI(args []string) (msg string, display bool, err error) {
 			}
 		}
 
+		if len(outputDoc.Prefixes) == 0 && len(outputDoc.IPv6Prefixes) == 0 {
+			rCode = 2
+		}
 		// only output text format if there are entries to output
 		if encoding == strText && (len(outputDoc.Prefixes) == 0 && len(outputDoc.IPv6Prefixes) == 0) {
 			return nil
@@ -275,5 +281,5 @@ func startCLI(args []string) (msg string, display bool, err error) {
 	}
 
 	sort.Sort(cli.FlagsByName(app.Flags))
-	return msg, display, app.Run(args)
+	return display, app.Run(args)
 }
