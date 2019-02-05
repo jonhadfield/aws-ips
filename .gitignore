@@ -13,3 +13,4 @@
 .idea/
 .local_dist/
 coverage.txt
+coverage.tmp
