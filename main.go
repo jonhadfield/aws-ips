@@ -98,6 +98,10 @@ func startCLI(args []string) (msg string, display bool, err error) {
 			Name:  "ip",
 			Usage: "find prefix by ip",
 		},
+		cli.StringFlag{
+			Name:  "name",
+			Usage: "find prefix by name",
+		},
 		cli.BoolFlag{
 			Name:  "4only",
 			Usage: "only output IPv4",
@@ -105,6 +109,10 @@ func startCLI(args []string) (msg string, display bool, err error) {
 		cli.BoolFlag{
 			Name:  "6only",
 			Usage: "only output IPv6",
+		},
+		cli.BoolFlag{
+			Name:  "no-amazon",
+			Usage: "exclude matches with service AMAZON",
 		},
 		cli.StringFlag{
 			Name:  "fields",
@@ -135,6 +143,8 @@ func startCLI(args []string) (msg string, display bool, err error) {
 		region := c.String("region")
 		service := c.String("service")
 		ip := c.String("ip")
+		name := c.String("name")
+		noAmazon := c.Bool("no-amazon")
 		encoding := c.String("encoding")
 		fields := c.String("fields")
 		textSeparator := c.String("separator")
@@ -142,6 +152,10 @@ func startCLI(args []string) (msg string, display bool, err error) {
 			display = false
 		} else {
 			display = true
+		}
+		if ip != "" && name != "" {
+			_, _ = fmt.Fprintf(c.App.Writer, "error: ip cannot be used in combination with name.\n")
+			os.Exit(1)
 		}
 		if ip != "" {
 			if region != "" || service != "" {
@@ -156,6 +170,13 @@ func startCLI(args []string) (msg string, display bool, err error) {
 				_, _ = fmt.Fprintf(c.App.Writer, "error: ip is invalid.\n")
 				os.Exit(1)
 			}
+		}
+		if name != "" {
+			if region != "" || service != "" {
+				_, _ = fmt.Fprintf(c.App.Writer, "error: name cannot be used with region or service.\n")
+				os.Exit(1)
+			}
+			// TODO: check name is valid (format and lookup)
 		}
 
 		for _, f := range strings.Split(fields, ",") {
@@ -192,11 +213,34 @@ func startCLI(args []string) (msg string, display bool, err error) {
 			if fields == "" {
 				fields = "all"
 			}
+		case name != "":
+			// Get IP for name
+			ips, err := net.LookupHost(name)
+			if err != nil {
+				_, _ = fmt.Fprintf(c.App.Writer, "error: failed to resolve: %s\n", name)
+				os.Exit(1)
+			}
+			ip = ips[0]
+			var lookupPrefixInput lookupPrefixInput
+			lookupPrefixInput.doc = loaded
+			lookupPrefixInput.ip = ip
+			lookupPrefixInput.noAmazon = noAmazon
+			var lookupOutput lookupPrefixOutput
+			lookupOutput, err = lookupPrefix(lookupPrefixInput)
+			if err != nil {
+				return err
+			}
+			outputDoc = lookupOutput.doc
+			// default to outputting all fields
+			if fields == "" {
+				fields = "all"
+			}
 		case service != "" || region != "":
 			var frInput filterRangesInput
 			frInput.Doc = loaded
 			frInput.region = region
 			frInput.service = service
+			frInput.noAmazon = noAmazon
 			var filteredOutput filterRangesOutput
 			filteredOutput = filterRanges(frInput)
 			outputDoc = filteredOutput.Doc

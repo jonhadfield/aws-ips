@@ -12,6 +12,9 @@ func lookupPrefix(input lookupPrefixInput) (output lookupPrefixOutput, err error
 	if netIP != nil {
 		if strings.Contains(netIP.String(), ":") {
 			for _, r := range input.doc.IPv6Prefixes {
+				if input.noAmazon && strings.ToLower(r.Service) == "amazon" {
+					continue
+				}
 				var netPrefix *net.IPNet
 				_, netPrefix, err = net.ParseCIDR(r.IPv6Prefix)
 				if netPrefix.Contains(netIP) {
@@ -20,6 +23,9 @@ func lookupPrefix(input lookupPrefixInput) (output lookupPrefixOutput, err error
 			}
 		} else {
 			for _, r := range input.doc.Prefixes {
+				if input.noAmazon && strings.ToLower(r.Service) == "amazon" {
+					continue
+				}
 				var netPrefix *net.IPNet
 				_, netPrefix, err = net.ParseCIDR(r.IPPrefix)
 				if netPrefix.Contains(netIP) {
@@ -33,8 +39,9 @@ func lookupPrefix(input lookupPrefixInput) (output lookupPrefixOutput, err error
 }
 
 type lookupPrefixInput struct {
-	doc IPRangeDoc
-	ip  string
+	doc      IPRangeDoc
+	ip       string
+	noAmazon bool
 }
 
 type lookupPrefixOutput struct {
