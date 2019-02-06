@@ -91,11 +91,11 @@ func startCLI(args []string) (display bool, err error) {
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
-			Name:  "region",
+			Name:  "region, r",
 			Usage: "AWS region",
 		},
 		cli.StringFlag{
-			Name:  "service",
+			Name:  "service, s",
 			Usage: "AWS service",
 		},
 		cli.StringFlag{
@@ -103,42 +103,42 @@ func startCLI(args []string) (display bool, err error) {
 			Usage: "find prefix by ip",
 		},
 		cli.StringFlag{
-			Name:  "name",
+			Name:  "name, n",
 			Usage: "find prefix by name",
 		},
 		cli.BoolFlag{
-			Name:  "4only",
+			Name:  "4only, 4",
 			Usage: "only output IPv4",
 		},
 		cli.BoolFlag{
-			Name:  "6only",
+			Name:  "6only, 6",
 			Usage: "only output IPv6",
 		},
 		cli.BoolFlag{
-			Name:  "no-amazon",
+			Name:  "no-amazon, na",
 			Usage: "exclude matches with service AMAZON",
 		},
 		cli.StringFlag{
-			Name:  "fields",
+			Name:  "fields, f",
 			Value: "all",
 			Usage: "cidr, region, service, all",
 		},
 		cli.StringFlag{
-			Name:  "encoding",
+			Name:  "encoding, e",
 			Value: "text",
 			Usage: "output encoding (json, yaml, text)",
 		},
 		cli.StringFlag{
-			Name:  "separator",
+			Name:  "separator, sep",
 			Value: " | ",
 			Usage: "field separator for text encoding",
 		},
 		cli.StringFlag{
-			Name:  "from-file",
+			Name:  "from-file, file",
 			Usage: "file downloaded from https://ip-ranges.amazonaws.com/ip-ranges.json",
 		},
 		cli.BoolFlag{
-			Name:  "silent",
+			Name:  "quiet, q",
 			Usage: "no stdout",
 		},
 	}
@@ -152,7 +152,7 @@ func startCLI(args []string) (display bool, err error) {
 		encoding := c.String("encoding")
 		fields := c.String("fields")
 		textSeparator := c.String("separator")
-		if c.Bool("silent") {
+		if c.Bool("quiet") {
 			display = false
 		} else {
 			display = true
