@@ -5,9 +5,8 @@ check network addresses for AWS Services
 
 ## about
 
-AWS publish a list of IP ranges that correspond to their services and regions. Linked to from [here](https://docs.aws.amazon.com/general/latest/gr/aws-ip-ranges.html).
-
-## features
+AWS publish a list of IP ranges that correspond to their services and regions. Linked to from [here](https://docs.aws.amazon.com/general/latest/gr/aws-ip-ranges.html).  
+aws-ips is a utility that downloads the latest list (or use a local copy of the list) and enabled you to:
 
 - list and filter prefixes (by region, service, cidr)
 - reverse lookup of IP address or FQDN to AWS range
