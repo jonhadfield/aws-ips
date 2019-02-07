@@ -29,10 +29,27 @@ $ install <aws-ips binary> /usr/local/bin/aws-ips
 An installer is planned, but for now...  
 Download the binary 'aws-ips_windows_amd64.exe' and rename to aws-ips.exe
 
-### commands and options:  
+### example usage  
+
+#### help
 ``
-$ aws-ips --help
+aws-ips --help
+``  
+
+#### filtering by service and region
+
+``
+aws-ips --service s3 --region eu-west-1
+``  
+
+#### reverse lookup by IP
+
+``
+aws-ips --ip 54.208.0.0
 ``
 
+#### AWS service relating to a domain name
 
-
+``
+aws-ips --name www.netflix.com
+``
