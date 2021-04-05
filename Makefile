@@ -44,6 +44,8 @@ install:
 mac-install: build
 	install .local_dist/aws-ips_darwin_amd64 /usr/local/bin/aws-ips
 
+find-updates:
+	go list -u -m -json all | go-mod-outdated -update -direct
 
 critic:
 	gocritic check-project .
